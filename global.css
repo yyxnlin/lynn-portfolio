@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #fafafa;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  body,
+  * {
+    cursor: url("/keroppi-cursor.png"), auto;
+  }
+
+  
+  a,
+  button,
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  select,
+  label,
+  [role="button"] {
+    cursor: url("/keroppi-cursor-link.png"), pointer;
+  }
+
+  .text-edge-outline {
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+  }
+}
+
+
+a {
+  color: #404040;
+  text-decoration: underline;
+  text-decoration-color: #d4d4d4;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+a:hover {
+  color: #eeeeee;
+  text-decoration-color: #a3a3a3;
+}
+
+
+::selection {
+  background: #e5e5e5;
+  color: #171717;
+}
+
+html {
+  scrollbar-gutter: stable;
+}

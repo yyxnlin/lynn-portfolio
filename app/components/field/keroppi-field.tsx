@@ -31,6 +31,11 @@ export function KeroppiField() {
       await new Promise((r) => setTimeout(r, 200));
 
       try {
+        console.log({
+          apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+          projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        });
+
         const snap = await getDocs(collection(db, "keroppis"));
 
         const data: Keroppi[] = snap.docs.map((doc) => ({

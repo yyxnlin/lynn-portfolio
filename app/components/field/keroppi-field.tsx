@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { KeroppiSprite } from "./keroppi-sprite";
 import { KeroppiTooltip } from "./keroppi-tooltip";
 import type { Keroppi } from "@/types/keroppi";
+import { db } from "@/lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 type TooltipState = {
   keroppi: Keroppi;
@@ -29,16 +31,18 @@ export function KeroppiField() {
       await new Promise((r) => setTimeout(r, 200));
 
       try {
-        const res = await fetch("/api/keroppis");
-        if (!res.ok) throw new Error("Failed to load");
+        const snap = await getDocs(collection(db, "keroppis"));
 
-        const data: { keroppis: Keroppi[] } = await res.json();
+        const data: Keroppi[] = snap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Keroppi[];
 
         if (!cancelled) {
-          setKeroppis(data.keroppis);
+          setKeroppis(data);
           setTimeout(() => setReady(true), 50);
         }
-      } catch {
+      } catch (err) {
         if (!cancelled) setKeroppis([]);
       } finally {
         if (!cancelled) setLoading(false);

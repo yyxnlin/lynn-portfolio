@@ -14,6 +14,8 @@ import {
   NAME_MAX,
   type Stroke,
 } from "@/types/keroppi";
+import { db } from "@/lib/firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 export function DrawCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -123,7 +125,6 @@ export function DrawCanvas() {
     setStrokes((prev) => prev.slice(0, -1));
   };
 
-  // ✅ FINAL: no placement step, just random placement
   const handleFinish = async () => {
     if (!name.trim()) {
       setStatus("Add your name.");
@@ -139,30 +140,19 @@ export function DrawCanvas() {
     setStatus(null);
 
     try {
-      const FIELD_WIDTH = 900; 
-      const FIELD_HEIGHT = 600;
-      const PADDING = 40;
+      await addDoc(collection(db, "keroppis"), {
+        name: name.trim(),
+        message: message.trim(),
+        strokes,
 
-      const res = await fetch("/api/keroppis", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          message: message.trim(),
-          strokes,
+        x: Math.random() * (900 - 80),
+        y: Math.random() * (600 - 80),
 
-          x: Math.random() * (FIELD_WIDTH - PADDING * 2),
-          y: Math.random() * (FIELD_HEIGHT - PADDING * 2),
+        scale: 1,
+        rotation: (Math.random() - 0.5) * 0.5,
 
-          scale: 1,
-          rotation: (Math.random() - 0.5) * 0.5,
-        }),
+        createdAt: Date.now(),
       });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "Save failed");
-      }
 
       setStatus("Placed in the field!");
 

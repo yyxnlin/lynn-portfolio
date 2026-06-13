@@ -2,12 +2,9 @@
 
 import Image from "next/image";
 import { FaLinkedinIn, FaGithub, FaEnvelope } from "react-icons/fa";
-import { Newsreader, JetBrains_Mono } from "next/font/google";
 import NeuralBackground from "../background-nodes";
 import { Footer } from "../../footer";
 
-const newsreader = Newsreader({ subsets: ["latin"] });
-const mono = JetBrains_Mono({ subsets: ["latin"] });
 
 export function HomeSection() {
   return (
@@ -21,11 +18,11 @@ export function HomeSection() {
             
             {/* left */}
             <div className="relative z-10">
-              <p className={`mb-6 text-sm tracking-[0.25em] text-neutral-400 ${mono.className}`}>
+              <p className={`mb-6 text-sm tracking-[0.25em] text-neutral-400 font-[var(--font-mono)]`}>
                 welcome to my page! ( ´ ▽ ` )ﾉ
               </p>
 
-              <h1 className={`${newsreader.className} text-6xl font-medium leading-none text-neutral-800 md:text-8xl`}>
+              <h1 className={`font-[var(--font-newsreader)] text-6xl font-medium leading-none text-neutral-800 md:text-8xl`}>
                 Lynn <span style={{ color: "#9F8DB3" }}>Tao</span>
               </h1>
 

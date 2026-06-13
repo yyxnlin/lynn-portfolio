@@ -41,6 +41,8 @@ export function AboutSection() {
             <a
               href="https://instagram.com/linezeats"
               className="underline decoration-neutral-300 underline-offset-4 hover:decoration-neutral-500"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               food account
             </a>

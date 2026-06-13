@@ -43,12 +43,16 @@ export function HomeSection() {
 
               <div className="mt-10 flex gap-4">
                 <a className="flex h-12 w-12 items-center justify-center rounded-full border border-neutral-200 bg-white"
-                  href="https://linkedin.com/in/lynnyltao">
+                  href="https://linkedin.com/in/lynnyltao"
+                  target="_blank"
+                  rel="noopener noreferrer">
                   <FaLinkedinIn size={18} />
                 </a>
 
                 <a className="flex h-12 w-12 items-center justify-center rounded-full border border-neutral-200 bg-white"
-                  href="https://github.com/yyxnlin">
+                  href="https://github.com/yyxnlin"
+                  target="_blank"
+                  rel="noopener noreferrer">
                   <FaGithub size={18} />
                 </a>
 

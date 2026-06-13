@@ -1,6 +1,4 @@
-<div align="center">
-    <h1 align="center">Portfolio Website</h1>
-</div>
+# Portfolio Website
 
 A personal website built with:
 

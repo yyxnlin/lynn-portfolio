@@ -61,6 +61,7 @@ export default function RootLayout({
     <html lang="en" className={[inter.variable, calSans.variable].join(" ")}>
       <head>
         <Analytics />
+        <meta name="robots" content="noindex,nofollow" />
       </head>
       <body
         className={process.env.NODE_ENV === "development" ? "debug-screens" : undefined}

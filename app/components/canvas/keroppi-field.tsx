@@ -82,7 +82,7 @@ export function KeroppiField() {
         <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between px-2">
           
           <div className="text-xs text-neutral-500 text-center sm:text-left">
-            {!loading && `${keroppis.length} in the field`}
+            {!loading && `${keroppis.length} in the canvas`}
           </div>
 
           <Link
@@ -125,13 +125,13 @@ export function KeroppiField() {
         >
           {loading && (
             <p className="absolute inset-0 flex items-center justify-center text-sm text-neutral-400">
-              Loading field…
+              Loading canvas
             </p>
           )}
 
           {!loading && keroppis.length === 0 && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-neutral-500 text-center px-4">
-              <p className="text-sm">The field is empty.</p>
+              <p className="text-sm">The canvas is empty.</p>
               <Link
                 href="/draw"
                 className="text-sm text-neutral-700 hover:text-neutral-900"

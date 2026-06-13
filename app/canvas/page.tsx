@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { KeroppiField } from "../components/field/keroppi-field";
+import { KeroppiField } from "../components/canvas/keroppi-field";
 import { Footer } from "../footer";
 
 export default function FieldPage() {

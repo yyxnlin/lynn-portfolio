@@ -7,7 +7,7 @@ const links = [
   { href: "/", label: "home" },
   { href: "/about", label: "about" },
   { href: "/projects", label: "projects" },
-  { href: "/field", label: "sketchbook" },
+  { href: "/canvas", label: "sketchbook" },
 ];
 
 export const Navigation = () => {

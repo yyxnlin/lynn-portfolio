@@ -154,13 +154,13 @@ export function DrawCanvas() {
         createdAt: Date.now(),
       });
 
-      setStatus("Placed in the field!");
+      setStatus("Placed in the canvas!");
 
       setStrokes([]);
       setName("");
       setMessage("");
 
-      setTimeout(() => router.push("/field"), 500);
+      setTimeout(() => router.push("/canvas"), 500);
     } catch (err) {
       setStatus(err instanceof Error ? err.message : "Could not save.");
     } finally {
@@ -177,15 +177,15 @@ export function DrawCanvas() {
             Draw your Keroppi
           </h1>
           <p className="mt-2 text-sm text-neutral-500">
-            Sketch on the blackboard, then click finish to place it in the field.
+            Sketch on the blackboard, then click finish to place it in the canvas.
           </p>
         </div>
 
         <Link
-          href="/field"
+          href="/canvas"
           className="text-sm text-neutral-500 no-underline hover:text-neutral-800"
         >
-          Visit field →
+          Visit canvas →
         </Link>
       </div>
 

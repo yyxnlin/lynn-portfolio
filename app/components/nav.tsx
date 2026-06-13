@@ -14,9 +14,17 @@ export const Navigation = () => {
   const pathname = usePathname();
 
   return (
-    <header className="fixed top-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 md:top-6 md:w-auto md:max-w-none">
+    <header className="fixed top-4 left-1/2 z-50 -translate-x-1/2 md:top-6">
       
-      <nav className="relative flex gap-1 overflow-x-auto rounded-md border-2 border-neutral-200 bg-white px-1 py-1 md:gap-1.5 md:px-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <nav className="
+        flex items-center gap-1
+        rounded-md border-2 border-neutral-200 bg-white
+        px-2 py-1
+        whitespace-nowrap
+        overflow-x-auto
+        [scrollbar-width:none]
+        [&::-webkit-scrollbar]:hidden
+      ">
         {links.map((link) => {
           const active = pathname === link.href;
 
@@ -35,8 +43,6 @@ export const Navigation = () => {
           );
         })}
       </nav>
-
-      
     </header>
   );
 };

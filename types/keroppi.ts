@@ -15,6 +15,7 @@ export type Keroppi = {
   name: string;
   message: string;
   strokes: Stroke[];
+  onClick?: (keroppi: Keroppi) => void;
   x: number;
   y: number;
   scale: number;

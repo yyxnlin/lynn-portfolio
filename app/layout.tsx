@@ -32,6 +32,9 @@ export const metadata: Metadata = {
     template: "%s | Lynn Tao",
   },
   description: "Engineering Science student at UofT",
+  icons:{
+    icon: "/icon.png"
+  },
   robots: {
     index: false,
     follow: false,

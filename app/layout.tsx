@@ -31,7 +31,6 @@ export const metadata: Metadata = {
     default: "Lynn Tao",
     template: "%s | Lynn Tao",
   },
-  description: "Engineering Science student at UofT",
   icons:{
     icon: "/icon.png"
   },

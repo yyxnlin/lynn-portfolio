@@ -4,9 +4,8 @@ import { PhotoCarousel } from "../photo-carousel";
 
 export function AboutSection() {
   return (
-    <section id="about" className="px-6 py-32">
-      <div className="mx-auto max-w-2xl">
-
+    <section id="about" className="px-6 py-28 md:py-36">
+      <div className="mx-auto max-w-3xl">
         {/* Header */}
         <div className="mb-16">
           <p className="text-xs tracking-[0.25em] text-neutral-400 uppercase">
@@ -21,7 +20,7 @@ export function AboutSection() {
 
         {/* Content */}
         
-        <div className="space-y-8 text-neutral-700 leading-relaxed text-base">
+        <div className="space-y-6 text-neutral-700 leading-relaxed text-base">
           
           <p>
             I’m a third year Engineering Science student at the University of Toronto,

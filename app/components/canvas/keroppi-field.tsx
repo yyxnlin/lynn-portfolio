@@ -76,7 +76,7 @@ export function KeroppiField() {
     <div className="flex min-h-screen w-full items-center justify-center bg-neutral-100 px-3 py-6">
       
       {/* WRAPPER */}
-      <div className="relative flex w-full max-w-5xl flex-col items-center gap-3">
+      <div className="relative flex w-full max-w-4xl flex-col items-center gap-3">
 
         {/* HEADER */}
         <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between px-2">
@@ -99,6 +99,7 @@ export function KeroppiField() {
               shadow-lg
               transition-all
               hover:bg-neutral-800
+              no-underline
               active:scale-95
             "
           >

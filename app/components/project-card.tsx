@@ -1,50 +1,67 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { Github, ExternalLink, BookOpen } from "lucide-react";
+import { Github, ExternalLink, BookOpen, FileText, PlayCircle } from "lucide-react";
 
 interface ProjectCardProps {
   title: string;
   description: string;
-  slug: string;
-  url?: string;
+  readUrl?: string;
+  github?: string;
+  demoUrl?: string;
   repository?: string;
   date?: string;
+  image?: string;
 }
 
 export function ProjectCard({
   title,
   description,
-  slug,
-  url,
-  repository,
+  readUrl,
+  github,
+  demoUrl,
   date,
+  image,
 }: ProjectCardProps) {
   return (
-    <div
+    <article
       className="
-        group flex h-full flex-col rounded-lg
-        border border-neutral-200 bg-white
-        transition-all duration-200
-        hover:-translate-y-1
-        hover:border-[#AADEE5]
+        group flex h-full flex-col
+        border border-neutral-200
+        bg-white
+        transition-colors duration-200
+        hover:bg-neutral-50
       "
     >
-      <div className="flex flex-1 flex-col p-5 sm:p-6">
+      {/* Image Area */}
+      <div
+        className="
+          relative h-44
+          overflow-hidden
+          border-b border-neutral-200
+          bg-neutral-50
+        "
+      >
+        {image && (
+          <Image
+            src={image}
+            alt=""
+            fill
+            className="
+              object-cover
+              opacity-90
+              transition-opacity duration-300
+              group-hover:opacity-100
+            "
+          />
+        )}
+      </div>
 
-        {/* Title */}
-        <h3 className="text-lg font-medium text-neutral-900 leading-snug">
-          {title}
-        </h3>
-
-        {/* Description */}
-        <p className="mt-3 text-sm leading-relaxed text-neutral-500">
-          {description}
-        </p>
-
-        {/* Date */}
+      {/* Content */}
+      <div className="flex flex-1 flex-col p-6">
         {date && (
-          <p className="mt-4 text-xs text-neutral-400">
+          <p className="text-xs uppercase tracking-[0.15em] text-neutral-400">
             {new Date(date).toLocaleDateString("en-US", {
               year: "numeric",
               month: "short",
@@ -52,41 +69,52 @@ export function ProjectCard({
           </p>
         )}
 
-        {/* Actions */}
-        <div className="mt-auto pt-5 flex gap-3">
-          {url && (
+        <h3 className="mt-3 text-xl font-medium leading-tight text-neutral-900">
+          {title}
+        </h3>
+
+        <p className="mt-3 text-sm leading-relaxed text-neutral-500">
+          {description}
+        </p>
+
+        <div className="mt-auto flex gap-5 pt-6 text-sm">
+          {readUrl && (
             <a
-              href={url}
+              href={readUrl}
               target="_blank"
-              className="text-xs text-neutral-500 hover:text-neutral-900 transition-colors flex items-center gap-1"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-neutral-500 hover:text-neutral-900"
             >
-              <ExternalLink size={14} />
-              Visit
+              <FileText size={14} />
+              Read
             </a>
           )}
 
-          {repository && (
+          {github && (
             <a
-              href={`https://github.com/${repository}`}
+              href={`https://github.com/${github}`}
               target="_blank"
-              className="text-xs text-neutral-500 hover:text-neutral-900 transition-colors flex items-center gap-1"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-neutral-500 hover:text-neutral-900"
             >
               <Github size={14} />
               GitHub
             </a>
           )}
 
-          {!url && !repository && (
-            <Link
-              href={`/projects/${slug}`}
-              className="text-xs text-neutral-500 hover:text-neutral-900 transition-colors flex items-center gap-1"
+          {demoUrl && (
+            <a
+              href={demoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-neutral-500 hover:text-neutral-900"
             >
-              <BookOpen size={14} />
-              Read
-            </Link>
+              <PlayCircle size={14} />
+              Demo
+            </a>
           )}
         </div>
       </div>
-    </div>
+    </article>
   );
 }

@@ -54,17 +54,14 @@ export function KeroppiSprite({
     <div
       className="absolute transition-opacity duration-500"
       style={{
-        left: keroppi.x * scale,
-        top: keroppi.y * scale,
+        left: keroppi.x,
+        top: keroppi.y,
         opacity: visible ? 1 : 0,
       }}
       onClick={() => onClick?.(keroppi)}
     >
       <div
         className="relative origin-top-left transition-transform duration-200 hover:scale-[1.06]"
-        style={{
-          transform: `rotate(${keroppi.rotation}rad) scale(${keroppi.scale * scale})`,
-        }}
         onMouseEnter={(e) => onHover(keroppi, e.clientX, e.clientY)}
         onMouseMove={(e) => onHover(keroppi, e.clientX, e.clientY)}
         onMouseLeave={onLeave}
@@ -83,8 +80,8 @@ export function KeroppiSprite({
           ref={canvasRef}
           className="block cursor-default"
           style={{
-            width: SPRITE_WIDTH * scale,
-            height: displayHeight * scale,
+            width: SPRITE_WIDTH,
+            height: displayHeight,
             filter: isHovered
               ? "brightness(1.15) contrast(1.05)"
               : "none",

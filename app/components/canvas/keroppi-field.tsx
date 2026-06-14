@@ -64,7 +64,11 @@ export function KeroppiField() {
       if (!boardRef.current) return;
 
       const rect = boardRef.current.getBoundingClientRect();
-      setScale(rect.width / BASE_WIDTH);
+
+      const scaleX = rect.width / BASE_WIDTH;
+      const scaleY = rect.height / BASE_HEIGHT;
+
+      setScale(Math.min(scaleX, scaleY));
     };
 
     updateScale();
@@ -73,52 +77,54 @@ export function KeroppiField() {
   }, []);
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-neutral-100 px-3 py-6">
-      
-      {/* WRAPPER */}
-      <div className="relative flex w-full max-w-4xl flex-col items-center gap-3">
+    <section className="bg-neutral-100 px-6 py-12 md:py-16">
+      <div
+        className="mx-auto"
+        style={{
+          width: "min(92vw, min(900px, calc((100vh - 180px) * 1.5)))",
+        }}
+      >
+        {/* Header */}
+        <div className="mb-4 mt-8 flex items-center justify-between gap-4">
 
-        {/* HEADER */}
-        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between px-2">
-          
-          <div className="text-xs text-neutral-500 text-center sm:text-left">
-            {!loading && `${keroppis.length} in the canvas`}
+          <div>
+            <h2 className="text-2xl font-medium text-neutral-900 md:text-3xl">
+              Sketchbook
+            </h2>
+
+            <p className="mt-1 text-sm text-neutral-500">
+              {!loading && `${keroppis.length} drawings on the canvas`}
+            </p>
           </div>
 
           <Link
             href="/draw"
             className="
-              w-full sm:w-auto
-              text-center
               rounded-full
               bg-neutral-900
-              px-5 py-2
+              px-4 py-2
               text-sm
               font-medium
               text-white
-              shadow-lg
-              transition-all
-              hover:bg-neutral-800
               no-underline
-              active:scale-95
+              transition-colors
+              hover:bg-neutral-800
             "
           >
-            add yours 🖌️
+            Add yours
           </Link>
         </div>
 
-        {/* BOARD */}
+        {/* Board */}
         <div
           ref={boardRef}
           className="
             relative overflow-hidden rounded-lg border border-neutral-700
-            w-[92vw]
-            max-w-[900px]
-            aspect-[3/2]
-            mx-auto
             touch-none
           "
           style={{
+            width: "100%",
+            aspectRatio: "3 / 2",
             backgroundColor: "#1a1a1a",
             boxShadow:
               "inset 0 0 40px rgba(0,0,0,0.5), 0 10px 30px rgba(0,0,0,0.2)",
@@ -131,8 +137,9 @@ export function KeroppiField() {
           )}
 
           {!loading && keroppis.length === 0 && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-neutral-500 text-center px-4">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4 text-center text-neutral-500">
               <p className="text-sm">The canvas is empty.</p>
+
               <Link
                 href="/draw"
                 className="text-sm text-neutral-700 hover:text-neutral-900"
@@ -142,8 +149,13 @@ export function KeroppiField() {
             </div>
           )}
 
-          {/* SPRITES (SCALED) */}
-          <div className="absolute inset-0">
+          {/* Sprites */}
+          <div
+            className="absolute inset-0 origin-top-left"
+            style={{
+              transform: `scale(${scale})`,
+            }}
+          >
             {keroppis.map((keroppi) => (
               <KeroppiSprite
                 key={keroppi.id}
@@ -168,7 +180,7 @@ export function KeroppiField() {
             ))}
           </div>
 
-          {/* TOOLTIP */}
+          {/* Tooltip */}
           {tooltip && (
             <KeroppiTooltip
               name={tooltip.keroppi.name}
@@ -178,7 +190,7 @@ export function KeroppiField() {
             />
           )}
 
-
+          {/* Modal */}
           {selected && (
             <div
               className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
@@ -188,7 +200,6 @@ export function KeroppiField() {
                 className="relative w-[85vw] max-w-[360px] rounded-lg bg-white p-4 shadow-xl"
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* close button */}
                 <button
                   className="absolute right-3 top-3 text-neutral-500 hover:text-black"
                   onClick={() => setSelected(null)}
@@ -196,21 +207,18 @@ export function KeroppiField() {
                   ✕
                 </button>
 
-                {/* title */}
                 <h2 className="text-lg font-medium text-neutral-800">
                   {selected.name}
                 </h2>
 
-                {/* message */}
                 <p className="mt-2 text-sm text-neutral-500">
                   {selected.message}
                 </p>
-
               </div>
             </div>
           )}
         </div>
       </div>
-    </div>
+    </section>
   );
 }

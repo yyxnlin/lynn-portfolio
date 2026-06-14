@@ -58,10 +58,6 @@ export function ProjectSection() {
             <h3 className="text-4xl font-medium text-neutral-900">
               Projects
             </h3>
-
-            <p className="mt-2 text-sm text-neutral-500">
-              Selected work in machine learning, robotics, and software development.
-            </p>
           </div>
 
           <div

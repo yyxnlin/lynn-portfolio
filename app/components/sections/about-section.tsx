@@ -1,4 +1,5 @@
 import { CoursesList } from "../courses-list"
+import { Awards } from "../awards"
 import { SectionReveal } from "../section-reveal";
 import { PhotoCarousel } from "../photo-carousel";
 
@@ -28,11 +29,11 @@ export function AboutSection() {
           </p>
 
           <p>
-            I’m interested in mathematics and its applications in various fields, including finance and machine learning. Throughout high school, I spent a lot of time in competitive math.
+            I’m interested in mathematics and its applications in various fields, including finance and machine learning. Throughout high school, I spent a lot of time in competitive math, earning distinctions in contests such as CSMC (Top 0.8%), COMC, Euclid (Top 2%), and qualifying for AIME.         
           </p>
 
           <p>
-            Outside of academics, I enjoy music, cooking, eating, running, and photography. Recently, I’ve also been learning Japanese on Duolingo, which has been a fun long-term side goal.
+            Outside of academics, I enjoy music, cooking and eating, running, and photography & video editing. Recently, I’ve also been learning Japanese on Duolingo, which has been a fun long-term side goal.
           </p>
 
           <p>
@@ -45,7 +46,7 @@ export function AboutSection() {
             >
               food account
             </a>
-            , where I post photos of food I eat (or make) 🍜
+            , where I post photos of food I eat (and make!) 🍜
           </p>
         </div>
 
@@ -119,28 +120,6 @@ export function AboutSection() {
         </SectionReveal>
 
 
-        {/* Awards */}
-        <SectionReveal>
-          <div className="mt-20 space-y-4">
-            <h3 className="text-xs tracking-[0.25em] text-neutral-400 uppercase">
-              Awards
-            </h3>
-
-            <ul className="space-y-2 text-sm text-neutral-600 leading-relaxed">
-              <li>Euclid: Top 2% (2024), Top 4% (2023)</li>
-              <li>CSMC: Top 0.8% (2023), Top 0.5% (2022)</li>
-              <li>COMC (Canadian Open Mathematics Challenge): Top 5% Distinction (2022, 2023)</li>
-              <li>AIME (American Invitational Mathematics Examination) qualifier (2024)</li>
-              <li>Hypatia: Top 3% (Group IV, 2023)</li>
-              <li>Fermat: Top 0.6% (Group IV, 2023)</li>
-              <li>Galois: Top 6% (2022)</li>
-              <li>CIMC: Top 3% (2021); Top 0.3% (2020)</li>
-              <li>Fryer: Perfect Score (2021)</li>
-              <li>Gauss: Perfect Score (2019)</li>
-            </ul>
-          </div>
-        </SectionReveal>
-
 
         {/* Education */}
         <SectionReveal>
@@ -208,6 +187,13 @@ export function AboutSection() {
           </div>
         </SectionReveal>
 
+
+        {/* Awards */}
+        <SectionReveal>
+          <div className="mt-20 space-y-4">
+            <Awards/>
+          </div>
+        </SectionReveal>
       </div>
     </section>
   );

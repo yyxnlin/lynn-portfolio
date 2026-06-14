@@ -172,12 +172,12 @@ export function DrawCanvas() {
     <div className="mx-auto max-w-2xl">
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="label-caps">Keroppi</p>
+          <p className="label-caps">Sketchbook</p>
           <h1 className="mt-2 text-3xl font-medium text-neutral-900 md:text-4xl">
-            Draw your Keroppi
+            Add your sketch
           </h1>
           <p className="mt-2 text-sm text-neutral-500">
-            Sketch on the blackboard, then click finish to place it in the canvas.
+            Draw on the blackboard, then click finish to place it in the canvas.
           </p>
         </div>
 

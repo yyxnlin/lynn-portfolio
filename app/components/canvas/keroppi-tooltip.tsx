@@ -10,19 +10,49 @@ type KeroppiTooltipProps = {
 export function KeroppiTooltip({ name, message, x, y }: KeroppiTooltipProps) {
   return (
     <div
-      className="pointer-events-none fixed z-50 max-w-[220px] rounded-md border border-neutral-200/90 bg-white/95 px-3 py-2 backdrop-blur-sm"
+      className="pointer-events-none fixed z-50"
       style={{
-        left: x + 14,
-        top: y + 14,
+        left: x + 10,
+        top: y + 10,
       }}
       role="tooltip"
     >
-      <p className="text-sm font-medium text-neutral-900">{name}</p>
-      {message && (
-        <p className="mt-0.5 text-xs leading-relaxed text-neutral-500">
-          {message}
+      {/* main note */}
+      <div
+        className="
+          relative max-w-[200px]
+          rotate-[-2deg]
+          rounded-2xl
+          bg-yellow-100/95
+          px-3 py-2
+          shadow-md
+          border border-yellow-200/70
+          backdrop-blur-sm
+        "
+      >
+        {/* name */}
+        <p className="text-sm font-semibold text-neutral-800">
+          ✿ {name}
         </p>
-      )}
+
+        {/* message */}
+        {message && (
+          <p className="mt-1 text-xs leading-relaxed text-neutral-600 italic">
+            {message}
+          </p>
+        )}
+
+      </div>
+
+      {/* little pointer triangle */}
+      <div
+        className="
+          absolute left-3 top-6
+          h-2 w-2 rotate-45
+          bg-yellow-100/95
+          border-l border-b border-yellow-200/70
+        "
+      />
     </div>
   );
 }

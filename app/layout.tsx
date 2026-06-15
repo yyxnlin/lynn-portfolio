@@ -3,8 +3,8 @@ import { Inter, Newsreader, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import { Metadata } from "next";
 
-import { Analytics } from "./components/analytics";
 import { Navigation } from "./components/nav";
+import { ThemeToggle } from "./components/theme-toggle";
 import CursorEffect from "./components/cursor-effect";
 import { HashScrollHandler } from "./components/hash-scroll";
 import { ScrollToTop } from "./components/scroll-to-top";
@@ -59,6 +59,7 @@ export default function RootLayout({
         <CursorEffect />
         <HashScrollHandler />
         <Navigation />
+        
 
         {children}
 

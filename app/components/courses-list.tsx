@@ -9,11 +9,11 @@ export function CoursesList() {
   return (
     <div className="flex w-full flex-col gap-5">
       <div className="flex flex-col gap-2">
-        <p className="text-xs uppercase tracking-[0.25em] text-neutral-400">
+        <p className="text-xs uppercase tracking-[0.25em] text-neutral-400 dark:text-neutral-500">
           Relevant Courses
         </p>
 
-        <p className="text-xs leading-relaxed text-neutral-400">
+        <p className="text-xs leading-relaxed text-neutral-400 dark:text-neutral-500">
           Note: These are my personal notes and are provided for reference only.
           Most focus on selected topics from each course and do not necessarily
           cover all material. Some courses are omitted.
@@ -22,11 +22,11 @@ export function CoursesList() {
 
       {COURSE_CATEGORIES.map((category) => (
         <section key={category.name}>
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#7F6899]">
+          <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#7F6899] dark:text-[#CBB6DD]">
             {category.name}
           </h3>
 
-          <ul className="divide-y divide-neutral-100 pl-3 pr-1">
+          <ul className="divide-y divide-neutral-100 dark:divide-neutral-800 pl-3 pr-1">
             {category.courses.map((course) => {
               const isOpen = openCourse === course.name;
 
@@ -42,22 +42,22 @@ export function CoursesList() {
                       justify-between gap-3
                       py-2 text-left
                       transition-colors
-                      hover:bg-neutral-50/50
+                      hover:bg-neutral-50/50 dark:hover:bg-neutral-800/40
                     "
                   >
-                    <span className="text-sm leading-snug text-neutral-700 group-hover:text-neutral-900">
+                    <span className="text-sm leading-snug text-neutral-700 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-neutral-100">
                       {course.name}
                     </span>
 
                     <div className="flex shrink-0 items-center gap-2">
                       {course.notes.length > 0 && (
-                        <span className="text-xs text-neutral-400">
+                        <span className="text-xs text-neutral-400 dark:text-neutral-500">
                           {course.notes.length} note
                           {course.notes.length > 1 ? "s" : ""}
                         </span>
                       )}
 
-                      <span className="text-xs text-neutral-400">
+                      <span className="text-xs text-neutral-400 dark:text-neutral-500">
                         {isOpen ? "−" : "+"}
                       </span>
                     </div>
@@ -73,9 +73,9 @@ export function CoursesList() {
                           rel="noreferrer"
                           className="
                             py-0.5
-                            text-xs text-neutral-400
+                            text-xs text-neutral-400 dark:text-neutral-500
                             transition-colors
-                            hover:text-neutral-700
+                            hover:text-neutral-700 dark:hover:text-neutral-300
                           "
                         >
                           {note.label}

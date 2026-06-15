@@ -13,7 +13,7 @@
     "@next/font": "13.5.11",
     "@upstash/redis": "1.36.4",
     "firebase": "^12.14.0",
-    "framer-motion": "10.18.0",
+    "framer-motion": "^10.18.0",
     "lucide-react": "0.284.0",
     "next": "16.2.9",
     "react": "18.3.1",

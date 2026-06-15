@@ -28,10 +28,10 @@ export function ProjectCard({
     <article
       className="
         group flex h-full flex-col
-        border border-neutral-200
-        bg-white
+        border border-neutral-200 dark:border-neutral-800
+        bg-white dark:bg-neutral-900
         transition-colors duration-200
-        hover:bg-neutral-50
+        hover:bg-neutral-50 dark:hover:bg-neutral-700/40
       "
     >
       {/* Image Area */}
@@ -39,8 +39,8 @@ export function ProjectCard({
         className="
           relative h-44
           overflow-hidden
-          border-b border-neutral-200
-          bg-neutral-50
+          border-b border-neutral-200 dark:border-neutral-800
+          bg-neutral-50 dark:bg-neutral-800
         "
       >
         {image && (
@@ -61,7 +61,7 @@ export function ProjectCard({
       {/* Content */}
       <div className="flex flex-1 flex-col p-6">
         {date && (
-          <p className="text-xs uppercase tracking-[0.15em] text-neutral-400">
+          <p className="text-xs uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500">
             {new Date(date).toLocaleDateString("en-US", {
               year: "numeric",
               month: "short",
@@ -69,11 +69,11 @@ export function ProjectCard({
           </p>
         )}
 
-        <h3 className="mt-3 text-xl font-medium leading-tight text-neutral-900">
+        <h3 className="mt-3 text-xl font-medium leading-tight text-neutral-900 dark:text-neutral-100">
           {title}
         </h3>
 
-        <p className="mt-3 text-sm leading-relaxed text-neutral-500">
+        <p className="mt-3 text-sm leading-relaxed text-neutral-500 dark:text-neutral-300">
           {description}
         </p>
 
@@ -83,7 +83,7 @@ export function ProjectCard({
               href={readUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-neutral-500 hover:text-neutral-900"
+              className="flex items-center gap-1 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
             >
               <FileText size={14} />
               Read
@@ -95,7 +95,7 @@ export function ProjectCard({
               href={`https://github.com/${github}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-neutral-500 hover:text-neutral-900"
+              className="flex items-center gap-1 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
             >
               <Github size={14} />
               GitHub
@@ -107,7 +107,7 @@ export function ProjectCard({
               href={demoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-neutral-500 hover:text-neutral-900"
+              className="flex items-center gap-1 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
             >
               <PlayCircle size={14} />
               Demo

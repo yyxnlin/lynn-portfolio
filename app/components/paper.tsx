@@ -23,7 +23,7 @@ export function Paper({
   return (
     <article
       className="
-        group border-b border-neutral-200
+        group border-b border-neutral-200 dark:border-neutral-800
         py-6 last:border-b-0
       "
     >
@@ -34,10 +34,10 @@ export function Paper({
             <span
               className="
                 inline-flex items-center rounded-full
-                bg-[#F6F3FA]
+                bg-[#F6F3FA] dark:bg-neutral-800
                 px-2.5 py-1
                 text-xs font-medium
-                text-[#88759E]
+                text-[#88759E] dark:text-[#CBB6DD]
               "
             >
               {venue}
@@ -48,7 +48,7 @@ export function Paper({
           <h3
             className="
               mt-3 text-xl font-medium
-              tracking-tight text-neutral-900
+              tracking-tight text-neutral-900 dark:text-neutral-100
             "
           >
             {title}
@@ -56,7 +56,7 @@ export function Paper({
 
           {/* Authors */}
           {authors && (
-            <p className="mt-2 text-sm leading-relaxed text-neutral-500">
+            <p className="mt-2 text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">
               {authors}
             </p>
           )}
@@ -69,7 +69,7 @@ export function Paper({
               href={arxivUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-neutral-500 hover:text-neutral-900 flex items-center gap-1"
+              className="text-xs text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 flex items-center gap-1"
             >
               <ExternalLink size={14} />
               arXiv
@@ -81,7 +81,7 @@ export function Paper({
               href={ssrnUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-neutral-500 hover:text-neutral-900 flex items-center gap-1"
+              className="text-xs text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 flex items-center gap-1"
             >
               <ExternalLink size={14} />
               SSRN
@@ -93,7 +93,7 @@ export function Paper({
               href={posterUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-neutral-500 hover:text-neutral-900 flex items-center gap-1"
+              className="text-xs text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 flex items-center gap-1"
             >
               <FileText size={14} />
               Poster

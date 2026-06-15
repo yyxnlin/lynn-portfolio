@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getCanvasPoint, renderStrokes } from "@/lib/drawing-render";
 import {
-  CANVAS_BG,
   CANVAS_HEIGHT,
   CANVAS_WIDTH,
   DEFAULT_DRAW_COLOR,
@@ -31,6 +30,9 @@ export function DrawCanvas() {
 
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+
+  /* ✿ cleaner blackboard (less green, more neutral ink black) */
+  const CANVAS_BG = "#0b0c0f";
 
   const redraw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -60,6 +62,7 @@ export function DrawCanvas() {
     redraw();
   }, [redraw]);
 
+  /* undo */
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "z") {
@@ -72,6 +75,7 @@ export function DrawCanvas() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
+  /* drawing */
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     isDrawingRef.current = true;
@@ -113,7 +117,7 @@ export function DrawCanvas() {
 
   const handleClear = () => {
     if (strokes.length === 0) return;
-    if (!window.confirm("Clear the blackboard? This cannot be undone.")) return;
+    if (!window.confirm("Clear the canvas? This cannot be undone.")) return;
 
     setStrokes([]);
     setCurrentStroke(null);
@@ -144,13 +148,10 @@ export function DrawCanvas() {
         name: name.trim(),
         message: message.trim(),
         strokes,
-
         x: Math.random() * (900 - 80),
         y: Math.random() * (600 - 80),
-
         scale: 1,
         rotation: (Math.random() - 0.5) * 0.5,
-
         createdAt: Date.now(),
       });
 
@@ -169,100 +170,122 @@ export function DrawCanvas() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-4xl text-neutral-900 dark:text-neutral-100">
+
+      {/* Header */}
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="label-caps">Sketchbook</p>
-          <h1 className="mt-2 text-3xl font-medium text-neutral-900 md:text-4xl">
-            Add your sketch
+          <p className="text-xs uppercase tracking-[0.3em] text-neutral-400">
+            ✿ sketch studio
+          </p>
+
+          <h1 className="mt-2 text-3xl font-medium md:text-4xl tracking-tight">
+            draw your doodle
           </h1>
-          <p className="mt-2 text-sm text-neutral-500">
-            Draw on the blackboard, then click finish to place it in the canvas.
+
+          <p className="mt-2 text-sm text-neutral-500 italic">
+            sketch something, then press finish
           </p>
         </div>
 
         <Link
           href="/canvas"
-          className="text-sm text-neutral-500 no-underline hover:text-neutral-800"
+          className="text-sm text-neutral-500 hover:text-neutral-800 transition"
         >
-          Visit canvas →
+          ↗ view canvas
         </Link>
       </div>
 
-      <div className="glass rounded-xl p-4 md:p-5">
-        {/* Name + message */}
-        <div className="mb-4 space-y-3 border-b border-neutral-200/80 pb-4">
-          <label className="block text-sm text-neutral-600">
-            Name <span className="text-neutral-400">(required)</span>
+      {/* Panel */}
+      <div className="rounded-2xl p-4 md:p-5 bg-white/90 dark:bg-neutral-900/80 shadow-xl border border-black/5 backdrop-blur-md">
+
+        {/* inputs */}
+        <div className="mb-4 space-y-3 pb-4 border-b border-black/5">
+
+          <label className="block text-sm text-neutral-700 dark:text-neutral-300">
+            Name
             <input
               type="text"
               value={name}
               maxLength={NAME_MAX}
               onChange={(e) => setName(e.target.value)}
-              placeholder="your name"
-              className="mt-1 w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-neutral-400"
+              className="mt-1 w-full rounded-xl border border-black/5 bg-white/80 dark:bg-neutral-800/70 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-pink-200"
             />
           </label>
 
-          <label className="block text-sm text-neutral-600">
+          <label className="block text-sm text-neutral-700 dark:text-neutral-300">
             Message
             <textarea
               value={message}
               maxLength={MESSAGE_MAX}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="a short note (optional)"
               rows={2}
-              className="mt-1 w-full resize-none rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-neutral-400"
+              className="mt-1 w-full rounded-xl border border-black/5 bg-white/80 dark:bg-neutral-800/70 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-pink-200"
             />
-            <span className="mt-0.5 block text-right text-xs text-neutral-400">
-              {message.length}/{MESSAGE_MAX}
-            </span>
           </label>
         </div>
 
-        {/* Tools */}
-        <div className="mb-4 flex flex-wrap items-center gap-4 border-b border-neutral-200/80 pb-4">
-          <div className="flex flex-wrap gap-1.5">
+        {/* ✿ TOOLBAR (FIXED SINGLE ROW) */}
+        <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl bg-neutral-50/70 dark:bg-neutral-800/40 p-3">
+
+          {/* colors */}
+          <div className="flex gap-1.5">
             {DRAW_COLORS.map((preset) => (
               <button
                 key={preset}
-                type="button"
                 onClick={() => setColor(preset)}
-                className={`h-7 w-7 rounded-full border-2 transition-transform hover:scale-110 ${
+                className={`h-6 w-6 rounded-full border transition hover:scale-110 ${
                   color === preset
-                    ? "border-neutral-800 ring-2 ring-neutral-400 ring-offset-1"
-                    : "border-neutral-400"
+                    ? "ring-2 ring-pink-200 ring-offset-1"
+                    : "border-black/10"
                 }`}
                 style={{ backgroundColor: preset }}
               />
             ))}
           </div>
 
-          <label className="flex flex-1 items-center gap-2 text-sm text-neutral-600">
-            Size
+          {/* brush (SMALLER NOW) */}
+          <div className="flex items-center gap-2 text-xs text-neutral-700 dark:text-neutral-300">
+            <span>size</span>
+
             <input
               type="range"
               min={3}
               max={10}
               value={brushSize}
               onChange={(e) => setBrushSize(Number(e.target.value))}
-              className="flex-1 accent-neutral-700"
+              className="w-24 accent-neutral-700"
             />
-            <span className="w-4 text-xs text-neutral-400">{brushSize}</span>
-          </label>
 
-          <div className="flex gap-2">
+            <span className="w-3 text-[11px]">{brushSize}</span>
+          </div>
+
+          {/* buttons (compressed row) */}
+          <div className="ml-auto flex gap-2">
+
             <button
               onClick={handleUndo}
               disabled={strokes.length === 0}
-              className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm text-neutral-600"
+              className="
+                rounded-full px-3 py-1 text-xs
+                border border-black/10 dark:border-white/10
+                bg-white/70 dark:bg-neutral-800/70
+                text-neutral-700 dark:text-neutral-200
+                hover:scale-105 transition
+              "
             >
               Undo
             </button>
 
             <button
               onClick={handleClear}
-              className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm text-neutral-600"
+              className="
+                rounded-full px-3 py-1 text-xs
+                border border-black/10 dark:border-white/10
+                bg-white/70 dark:bg-neutral-800/70
+                text-neutral-700 dark:text-neutral-200
+                hover:scale-105 transition
+              "
             >
               Clear
             </button>
@@ -270,15 +293,17 @@ export function DrawCanvas() {
             <button
               onClick={handleFinish}
               disabled={saving}
-              className="rounded-md border border-neutral-800 bg-neutral-800 px-4 py-1.5 text-sm text-white"
+              className="rounded-full px-4 py-1 text-xs bg-neutral-900 text-white hover:scale-105 transition"
             >
-              {saving ? "Saving..." : "Finish"}
+              {saving ? "..." : "Finish"}
             </button>
+
           </div>
         </div>
 
         {/* Canvas */}
-        <div className="rounded-sm border-4 border-neutral-600 bg-neutral-700 p-2">
+        <div className="rounded-2xl border border-black/10 bg-neutral-900 p-2 shadow-2xl">
+
           <canvas
             ref={canvasRef}
             className="block w-full cursor-crosshair touch-none"
@@ -291,6 +316,7 @@ export function DrawCanvas() {
             onPointerUp={handlePointerUp}
             onPointerLeave={handlePointerUp}
           />
+
         </div>
 
         {status && (
@@ -298,6 +324,7 @@ export function DrawCanvas() {
             {status}
           </p>
         )}
+
       </div>
     </div>
   );

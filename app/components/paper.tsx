@@ -34,10 +34,10 @@ export function Paper({
             <span
               className="
                 inline-flex items-center rounded-full
-                bg-[#F6F3FA] dark:bg-neutral-800
+                bg-[#F2ECF8] dark:bg-neutral-800
                 px-2.5 py-1
                 text-xs font-medium
-                text-[#88759E] dark:text-[#CBB6DD]
+                text-[#7F6A99] dark:text-[#CBB6DD]
               "
             >
               {venue}

@@ -37,7 +37,14 @@ export function AboutSection() {
             I also run a {" "}
             <a
               href="https://instagram.com/linezeats"
-              className="underline decoration-neutral-300 dark:decoration-neutral-600 underline-offset-4 hover:decoration-neutral-500 dark:hover:decoration-neutral-400"
+              className="
+                text-[#88759E] dark:text-[#CBB6DD]
+                underline underline-offset-4
+                decoration-[#CBB6DD] dark:decoration-[#88759E]
+                hover:text-[#75618D] dark:hover:text-[#D8C4E8]
+                hover:decoration-[#88759E] dark:hover:decoration-[#CBB6DD]
+                transition-colors
+              "
               target="_blank"
               rel="noopener noreferrer"
             >

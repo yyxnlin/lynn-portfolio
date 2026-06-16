@@ -73,9 +73,10 @@ export function CoursesList() {
                           rel="noreferrer"
                           className="
                             py-0.5
-                            text-xs text-neutral-400 dark:text-neutral-500
+                            text-xs
+                            text-sky-600 dark:text-sky-300
                             transition-colors
-                            hover:text-neutral-700 dark:hover:text-neutral-300
+                            hover:text-sky-700 dark:hover:text-sky-200
                           "
                         >
                           {note.label}

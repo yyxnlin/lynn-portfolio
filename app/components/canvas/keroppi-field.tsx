@@ -30,13 +30,19 @@ export function KeroppiField() {
   const [mouse, setMouse] = useState<{ x: number; y: number } | null>(null);
 
   const boardRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
-  const [dots, setDots] = useState<{ x: number; y: number }[]>([]);
+  const router = useRouter();
 
   const BASE_WIDTH = 900;
   const BASE_HEIGHT = 600;
 
-  const router = useRouter();
+  const [camera, setCamera] = useState({ x: 0, y: 0 });
+
+  const isDragging = useRef(false);
+  const hasDragged = useRef(false);
+  const dragStart = useRef({ x: 0, y: 0 });
+  const lastMouse = useRef({ x: 0, y: 0 });
+
+  const DRAG_THRESHOLD = 4; // pixels
 
   /* -------------------- load -------------------- */
   useEffect(() => {
@@ -70,23 +76,6 @@ export function KeroppiField() {
     };
   }, []);
 
-  /* -------------------- scale -------------------- */
-  useEffect(() => {
-    const updateScale = () => {
-      if (!boardRef.current) return;
-
-      const rect = boardRef.current.getBoundingClientRect();
-      const scaleX = rect.width / BASE_WIDTH;
-      const scaleY = rect.height / BASE_HEIGHT;
-
-      setScale(Math.min(scaleX, scaleY));
-    };
-
-    updateScale();
-    window.addEventListener("resize", updateScale);
-    return () => window.removeEventListener("resize", updateScale);
-  }, []);
-
   /* -------------------- placement mode -------------------- */
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -101,7 +90,56 @@ export function KeroppiField() {
     setPlacing(true);
   }, []);
 
-  /* -------------------- FIXED MOUSE TRACKING -------------------- */
+  /* -------------------- PAN -------------------- */
+  useEffect(() => {
+    const el = boardRef.current;
+    if (!el) return;
+
+    const down = (e: MouseEvent) => {
+      isDragging.current = true;
+      hasDragged.current = false;
+
+      dragStart.current = { x: e.clientX, y: e.clientY };
+      lastMouse.current = { x: e.clientX, y: e.clientY };
+    };
+
+    const move = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+
+      const dx = e.clientX - lastMouse.current.x;
+      const dy = e.clientY - lastMouse.current.y;
+
+      lastMouse.current = { x: e.clientX, y: e.clientY };
+
+      const totalDx = e.clientX - dragStart.current.x;
+      const totalDy = e.clientY - dragStart.current.y;
+
+      if (Math.abs(totalDx) > DRAG_THRESHOLD || Math.abs(totalDy) > DRAG_THRESHOLD) {
+        hasDragged.current = true;
+      }
+
+      setCamera((c) => ({
+        x: c.x + dx,
+        y: c.y + dy,
+      }));
+    };
+
+    const up = () => {
+      isDragging.current = false;
+    };
+
+    el.addEventListener("mousedown", down);
+    window.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", up);
+
+    return () => {
+      el.removeEventListener("mousedown", down);
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mouseup", up);
+    };
+  }, []);
+
+  /* -------------------- MOUSE TRACKING -------------------- */
   useEffect(() => {
     if (!placing) return;
 
@@ -110,25 +148,31 @@ export function KeroppiField() {
 
       const rect = boardRef.current.getBoundingClientRect();
 
-      const nx = (e.clientX - rect.left) / rect.width;
-      const ny = (e.clientY - rect.top) / rect.height;
+      const nx = e.clientX - rect.left;
+      const ny = e.clientY - rect.top;
 
-      const baseX = nx * BASE_WIDTH;
-      const baseY = ny * BASE_HEIGHT;
+      const worldX = nx - camera.x;
+      const worldY = ny - camera.y;
 
-      setMouse({ x: baseX, y: baseY });
+      setMouse({ x: worldX, y: worldY });
     };
 
     window.addEventListener("mousemove", handleMove);
     return () => window.removeEventListener("mousemove", handleMove);
-  }, [placing]);
+  }, [placing, camera]);
 
-  /* -------------------- click to place -------------------- */
+  /* -------------------- CLICK TO PLACE -------------------- */
   useEffect(() => {
     if (!placing || !pending) return;
 
     const handleClick = async () => {
       if (!mouse) return;
+
+      // KEY FIX: ignore click if drag happened
+      if (hasDragged.current) {
+        hasDragged.current = false;
+        return;
+      }
 
       await addDoc(collection(db, "keroppis"), {
         ...pending,
@@ -148,7 +192,7 @@ export function KeroppiField() {
     return () => window.removeEventListener("click", handleClick);
   }, [placing, pending, mouse]);
 
-  /* -------------------- ESC cancel -------------------- */
+  /* -------------------- ESC -------------------- */
   useEffect(() => {
     if (!placing) return;
 
@@ -169,21 +213,9 @@ export function KeroppiField() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [placing, router]);
 
-  /* -------------------- ink trail -------------------- */
-  useEffect(() => {
-    const handleMove = (e: MouseEvent) => {
-      setDots((prev) => [...prev.slice(-10), { x: e.clientX, y: e.clientY }]);
-    };
-
-    window.addEventListener("mousemove", handleMove);
-    return () => window.removeEventListener("mousemove", handleMove);
-  }, []);
-
   return (
     <section className="px-0 py-10 md:py-14">
       <div className="mx-auto max-w-5xl">
-
-        {/* Header */}
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-medium tracking-tight text-neutral-900 dark:text-neutral-100 md:text-3xl">
@@ -205,50 +237,50 @@ export function KeroppiField() {
           </Link>
         </div>
 
-        {/* Board */}
         <div className="w-full aspect-[3/2]">
           <div
             ref={boardRef}
-            className="relative h-full w-full overflow-hidden rounded-2xl border border-neutral-600/40 shadow-xl touch-none"
+            className="relative h-full w-full overflow-hidden rounded-2xl border border-neutral-600/40 shadow-xl touch-none cursor-grab active:cursor-grabbing"
             style={{
               background: "#000",
               boxShadow:
                 "inset 0 0 70px rgba(0,0,0,0.75), 0 25px 60px rgba(0,0,0,0.35)",
             }}
           >
+            <div
+              className="absolute bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full px-4 py-2 bg-white/80 dark:bg-neutral-900/70 border border-black/10 text-[11px] text-neutral-600 dark:text-neutral-300 backdrop-blur-md pointer-events-none"
+            >
+              drag to move around ✿
+            </div>
 
-            {/* PLACEMENT BANNER */}
-            {placing && (
-              <div className="absolute left-1/2 top-4 z-50 -translate-x-1/2 rounded-full px-4 py-2 bg-white/90 dark:bg-neutral-900/80 border border-black/10 text-xs text-neutral-800 dark:text-neutral-200 backdrop-blur-md">
-                ✿ Click to place your doodle • Esc to cancel
-              </div>
-            )}
-
-            {/* sprites layer */}
             <div
               className="absolute inset-0 origin-top-left"
-              style={{ transform: `scale(${scale})` }}
+              style={{
+                transform: `translate(${camera.x}px, ${camera.y}px)`,
+              }}
             >
-              {keroppis.map((keroppi, i) => (
-                <div key={keroppi.id}>
-                  <KeroppiSprite
-                    keroppi={keroppi}
-                    visible={ready}
-                    scale={scale}
-                    isHovered={hoveredId === keroppi.id}
-                    onClick={(k) => setSelected(k)}
-                    onHover={(k, x, y) => {
-                      if (placing) return;
-                      setHoveredId(k.id);
-                      setTooltip({ keroppi: k, x, y });
-                    }}
-                    onLeave={() => {
-                      if (placing) return;
-                      setHoveredId(null);
-                      setTooltip(null);
-                    }}
-                  />
-                </div>
+              {keroppis.map((keroppi) => (
+                <KeroppiSprite
+                  key={keroppi.id}
+                  keroppi={keroppi}
+                  visible={ready}
+                  scale={1}
+                  isHovered={hoveredId === keroppi.id}
+                  onClick={(k) => {
+                    if (hasDragged.current) return;
+                    setSelected(k);
+                  }}
+                  onHover={(k, x, y) => {
+                    if (placing) return;
+                    setHoveredId(k.id);
+                    setTooltip({ keroppi: k, x, y });
+                  }}
+                  onLeave={() => {
+                    if (placing) return;
+                    setHoveredId(null);
+                    setTooltip(null);
+                  }}
+                />
               ))}
 
               {placing && pending && mouse && (
@@ -281,7 +313,6 @@ export function KeroppiField() {
               )}
             </div>
 
-            {/* tooltip */}
             {!placing && tooltip && (
               <KeroppiTooltip
                 name={tooltip.keroppi.name}
@@ -290,73 +321,42 @@ export function KeroppiField() {
                 y={tooltip.y}
               />
             )}
-        {/* modal */}
-        {selected && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
-            onClick={() => setSelected(null)}
-          >
-            <div className="flex flex-col items-center">
-              
+
+            {selected && (
               <div
-                className="relative w-[55vw] max-w-[340px] rounded-2xl bg-white/95 shadow-2xl border border-black/5 backdrop-blur-md overflow-hidden animate-in fade-in zoom-in-95"
-                onClick={(e) => e.stopPropagation()}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+                onClick={() => setSelected(null)}
               >
-                {/* subtle ring */}
-                <div className="absolute inset-0 rounded-2xl ring-1 ring-black/5 pointer-events-none" />
-
-                {/* top gradient bar */}
-                <div className="h-2 w-full bg-gradient-to-r from-pink-200 via-orange-200 to-yellow-200" />
-
-                {/* close button */}
-                <button
-                  className="absolute right-3 top-3 text-neutral-400 hover:text-neutral-700 text-sm"
-                  onClick={() => setSelected(null)}
+                <div
+                  className="flex flex-col items-center"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  ✕
-                </button>
+                  <div className="relative w-[55vw] max-w-[340px] rounded-2xl bg-white/95 shadow-2xl border border-black/5 backdrop-blur-md overflow-hidden">
+                    <div className="h-2 w-full bg-gradient-to-r from-pink-200 via-orange-200 to-yellow-200" />
+                    <button
+                      className="absolute right-3 top-3 text-neutral-400 hover:text-neutral-700 text-sm"
+                      onClick={() => setSelected(null)}
+                    >
+                      ✕
+                    </button>
 
-                <div className="p-4">
-                  {/* name */}
-                  <h2 className="text-base font-semibold text-neutral-800 tracking-tight">
-                    ✿ {selected.name}
-                  </h2>
+                    <div className="p-4">
+                      <h2 className="text-base font-semibold text-neutral-800">
+                        ✿ {selected.name}
+                      </h2>
 
-                  {/* message */}
-                  <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
-                    {selected.message}
-                  </p>
+                      <p className="mt-2 text-sm text-neutral-500">
+                        {selected.message}
+                      </p>
+                    </div>
+                  </div>
 
-                  {/* tiny footer doodle */}
-                  <div className="mt-4 flex justify-end text-[11px] text-neutral-300">
-                    <span>•ᴗ•</span>
+                  <div className="mt-3 text-[11px] text-neutral-300">
+                    tap outside to close
                   </div>
                 </div>
               </div>
-
-              {/* OUTSIDE hint */}
-              <div className="mt-3 text-[11px] text-neutral-300 text-center">
-                tap outside to close
-              </div>
-
-            </div>
-          </div>
-        )}
-
-
-            {/* ink trail */}
-            {dots.map((d, i) => (
-              <div
-                key={i}
-                className="pointer-events-none fixed h-1 w-1 rounded-full bg-neutral-400"
-                style={{
-                  left: d.x,
-                  top: d.y,
-                  opacity: i / dots.length,
-                  transform: "translate(-50%, -50%)",
-                }}
-              />
-            ))}
+            )}
 
           </div>
         </div>

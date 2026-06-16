@@ -49,8 +49,8 @@ export function AboutSection() {
               rel="noopener noreferrer"
             >
               food account
-            </a>
-            , on Instagram, where I sometimes post photos of food I eat (and make!) 🍜
+            </a>{" "}
+            on Instagram, where I sometimes post photos of food I eat (and make!) 🍜
           </p>
         </div>
 

@@ -80,7 +80,7 @@ export function KeroppiSprite({
       >
         <canvas
           ref={canvasRef}
-          className="block cursor-default"
+          className="block"
           style={{
             width: SPRITE_WIDTH,
             height: displayHeight,

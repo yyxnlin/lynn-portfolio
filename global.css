@@ -38,13 +38,21 @@
   input[type="reset"],
   select,
   label,
-  [role="button"] {
+  [role="button"] 
+  .cursor-grab,
+  .cursor-grabbing {
+    cursor: url("/keroppi-cursor-link.png"), pointer;
+  }
+
+  canvas {
     cursor: url("/keroppi-cursor-link.png"), pointer;
   }
 
   .text-edge-outline {
     -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
   }
+
+
 }
 
 

@@ -41,6 +41,7 @@ export function KeroppiField() {
   const hasDragged = useRef(false);
   const dragStart = useRef({ x: 0, y: 0 });
   const lastMouse = useRef({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
 
   const DRAG_THRESHOLD = 4; // pixels
 
@@ -97,10 +98,17 @@ export function KeroppiField() {
 
     const down = (e: MouseEvent) => {
       isDragging.current = true;
+      setIsPanning(true);
+
       hasDragged.current = false;
 
       dragStart.current = { x: e.clientX, y: e.clientY };
       lastMouse.current = { x: e.clientX, y: e.clientY };
+    };
+
+    const up = () => {
+      isDragging.current = false;
+      setIsPanning(false);
     };
 
     const move = (e: MouseEvent) => {
@@ -124,9 +132,6 @@ export function KeroppiField() {
       }));
     };
 
-    const up = () => {
-      isDragging.current = false;
-    };
 
     el.addEventListener("mousedown", down);
     window.addEventListener("mousemove", move);
@@ -240,12 +245,15 @@ export function KeroppiField() {
         <div className="w-full aspect-[3/2]">
           <div
             ref={boardRef}
-            className="relative h-full w-full overflow-hidden rounded-2xl border border-neutral-600/40 shadow-xl touch-none cursor-grab active:cursor-grabbing"
-            style={{
-              background: "#000",
-              boxShadow:
-                "inset 0 0 70px rgba(0,0,0,0.75), 0 25px 60px rgba(0,0,0,0.35)",
-            }}
+            className={`relative h-full w-full overflow-hidden rounded-2xl border border-neutral-600/40 shadow-xl touch-none`}
+              style={{
+                background: "#000",
+                boxShadow:
+                  "inset 0 0 70px rgba(0,0,0,0.75), 0 25px 60px rgba(0,0,0,0.35)",
+                cursor: isPanning
+                  ? "url('/keroppi-cursor-link.png'), grabbing"
+                  : "url('/keroppi-cursor.png'), grab",
+              }}
           >
             <div
               className="absolute bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full px-4 py-2 bg-white/80 dark:bg-neutral-900/70 border border-black/10 text-[11px] text-neutral-600 dark:text-neutral-300 backdrop-blur-md pointer-events-none"

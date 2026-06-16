@@ -6,7 +6,8 @@ import { KeroppiSprite } from "./keroppi-sprite";
 import { KeroppiTooltip } from "./keroppi-tooltip";
 import type { Keroppi } from "@/types/keroppi";
 import { db } from "@/lib/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { addDoc, collection, getDocs } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 
 type TooltipState = {
   keroppi: Keroppi;
@@ -18,9 +19,15 @@ export function KeroppiField() {
   const [keroppis, setKeroppis] = useState<Keroppi[]>([]);
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
+
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Keroppi | null>(null);
+
+  const [placing, setPlacing] = useState(false);
+  const [pending, setPending] = useState<any | null>(null);
+
+  const [mouse, setMouse] = useState<{ x: number; y: number } | null>(null);
 
   const boardRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -28,6 +35,8 @@ export function KeroppiField() {
 
   const BASE_WIDTH = 900;
   const BASE_HEIGHT = 600;
+
+  const router = useRouter();
 
   /* -------------------- load -------------------- */
   useEffect(() => {
@@ -78,6 +87,88 @@ export function KeroppiField() {
     return () => window.removeEventListener("resize", updateScale);
   }, []);
 
+  /* -------------------- placement mode -------------------- */
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const isPlacing = url.searchParams.get("placing") === "1";
+
+    if (!isPlacing) return;
+
+    const raw = sessionStorage.getItem("pending_keroppi");
+    if (!raw) return;
+
+    setPending(JSON.parse(raw));
+    setPlacing(true);
+  }, []);
+
+  /* -------------------- FIXED MOUSE TRACKING -------------------- */
+  useEffect(() => {
+    if (!placing) return;
+
+    const handleMove = (e: MouseEvent) => {
+      if (!boardRef.current) return;
+
+      const rect = boardRef.current.getBoundingClientRect();
+
+      const nx = (e.clientX - rect.left) / rect.width;
+      const ny = (e.clientY - rect.top) / rect.height;
+
+      const baseX = nx * BASE_WIDTH;
+      const baseY = ny * BASE_HEIGHT;
+
+      setMouse({ x: baseX, y: baseY });
+    };
+
+    window.addEventListener("mousemove", handleMove);
+    return () => window.removeEventListener("mousemove", handleMove);
+  }, [placing]);
+
+  /* -------------------- click to place -------------------- */
+  useEffect(() => {
+    if (!placing || !pending) return;
+
+    const handleClick = async () => {
+      if (!mouse) return;
+
+      await addDoc(collection(db, "keroppis"), {
+        ...pending,
+        x: mouse.x,
+        y: mouse.y,
+      });
+
+      sessionStorage.removeItem("pending_keroppi");
+
+      setPlacing(false);
+      setPending(null);
+
+      window.location.href = "/canvas";
+    };
+
+    window.addEventListener("click", handleClick);
+    return () => window.removeEventListener("click", handleClick);
+  }, [placing, pending, mouse]);
+
+  /* -------------------- ESC cancel -------------------- */
+  useEffect(() => {
+    if (!placing) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        sessionStorage.removeItem("pending_keroppi");
+        setPlacing(false);
+        setPending(null);
+
+        const url = new URL(window.location.href);
+        url.searchParams.delete("placing");
+
+        router.replace(url.pathname + url.search);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [placing, router]);
+
   /* -------------------- ink trail -------------------- */
   useEffect(() => {
     const handleMove = (e: MouseEvent) => {
@@ -108,83 +199,38 @@ export function KeroppiField() {
 
           <Link
             href="/draw"
-            className="
-              rotate-[-1deg]
-              rounded-full
-              bg-neutral-900 dark:bg-neutral-100
-              px-4 py-2
-              text-sm text-white dark:text-neutral-900
-              shadow-sm
-              transition
-              hover:rotate-0 hover:bg-neutral-800 dark:hover:bg-neutral-200
-              wobble
-              no-underline
-            "
+            className="rotate-[-1deg] rounded-full bg-neutral-900 dark:bg-neutral-100 px-4 py-2 text-sm text-white dark:text-neutral-900 no-underline shadow-sm transition hover:rotate-0"
           >
             add a doodle ✎
           </Link>
         </div>
 
-        {/* Board wrapper */}
+        {/* Board */}
         <div className="w-full aspect-[3/2]">
           <div
             ref={boardRef}
-            className="
-              relative h-full w-full overflow-hidden rounded-2xl border
-              border-neutral-600/40 dark:border-neutral-700/40
-              shadow-xl touch-none
-            "
+            className="relative h-full w-full overflow-hidden rounded-2xl border border-neutral-600/40 shadow-xl touch-none"
             style={{
-              background: "#000000", // ALWAYS BLACK
+              background: "#000",
               boxShadow:
                 "inset 0 0 70px rgba(0,0,0,0.75), 0 25px 60px rgba(0,0,0,0.35)",
             }}
           >
-            {/* grain */}
-            <div
-              className="pointer-events-none absolute inset-0 opacity-[0.06] mix-blend-overlay dark:opacity-[0.04]"
-              style={{
-                backgroundImage:
-                  "radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px)",
-                backgroundSize: "3px 3px",
-              }}
-            />
 
-            {/* loading */}
-            {loading && (
-              <p className="absolute inset-0 flex items-center justify-center text-sm italic text-neutral-400 dark:text-neutral-500">
-                pinning doodles onto the page...
-              </p>
-            )}
-
-            {/* empty */}
-            {!loading && keroppis.length === 0 && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center text-neutral-500 dark:text-neutral-400">
-                <p className="text-sm italic">this sketchbook is still blank</p>
-                <Link
-                  href="/draw"
-                  className="text-sm underline decoration-dotted hover:text-neutral-900 dark:hover:text-neutral-100"
-                >
-                  leave the first doodle ✿
-                </Link>
+            {/* PLACEMENT BANNER */}
+            {placing && (
+              <div className="absolute left-1/2 top-4 z-50 -translate-x-1/2 rounded-full px-4 py-2 bg-white/90 dark:bg-neutral-900/80 border border-black/10 text-xs text-neutral-800 dark:text-neutral-200 backdrop-blur-md">
+                ✿ Click to place your doodle • Esc to cancel
               </div>
             )}
 
-            {/* sprites */}
+            {/* sprites layer */}
             <div
               className="absolute inset-0 origin-top-left"
               style={{ transform: `scale(${scale})` }}
             >
               {keroppis.map((keroppi, i) => (
-                <div
-                  key={keroppi.id}
-                  style={{ transitionDelay: `${i * 35}ms` }}
-                  className={`
-                    opacity-0 translate-y-2 scale-95
-                    transition-all duration-500 ease-out
-                    ${ready ? "opacity-100 translate-y-0 scale-100" : ""}
-                  `}
-                >
+                <div key={keroppi.id}>
                   <KeroppiSprite
                     keroppi={keroppi}
                     visible={ready}
@@ -192,24 +238,51 @@ export function KeroppiField() {
                     isHovered={hoveredId === keroppi.id}
                     onClick={(k) => setSelected(k)}
                     onHover={(k, x, y) => {
+                      if (placing) return;
                       setHoveredId(k.id);
-                      setTooltip({
-                        keroppi: k,
-                        x,
-                        y,
-                      });
+                      setTooltip({ keroppi: k, x, y });
                     }}
                     onLeave={() => {
+                      if (placing) return;
                       setHoveredId(null);
                       setTooltip(null);
                     }}
                   />
                 </div>
               ))}
+
+              {placing && pending && mouse && (
+                <div
+                  style={{
+                    position: "absolute",
+                    left: mouse.x,
+                    top: mouse.y,
+                    transform: "translate(-50%, -50%)",
+                    opacity: 0.5,
+                    pointerEvents: "none",
+                    filter: "grayscale(1)",
+                  }}
+                >
+                  <KeroppiSprite
+                    keroppi={{
+                      ...pending,
+                      id: "ghost",
+                      x: 0,
+                      y: 0,
+                    }}
+                    visible={true}
+                    scale={1}
+                    isHovered={false}
+                    onClick={() => {}}
+                    onHover={() => {}}
+                    onLeave={() => {}}
+                  />
+                </div>
+              )}
             </div>
 
             {/* tooltip */}
-            {tooltip && (
+            {!placing && tooltip && (
               <KeroppiTooltip
                 name={tooltip.keroppi.name}
                 message={tooltip.keroppi.message}
@@ -217,67 +290,65 @@ export function KeroppiField() {
                 y={tooltip.y}
               />
             )}
-
-            {/* modal */}
-            {selected && (
+        {/* modal */}
+        {selected && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+            onClick={() => setSelected(null)}
+          >
+            <div className="flex flex-col items-center">
+              
               <div
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
-                onClick={() => setSelected(null)}
+                className="relative w-[55vw] max-w-[340px] rounded-2xl bg-white/95 shadow-2xl border border-black/5 backdrop-blur-md overflow-hidden animate-in fade-in zoom-in-95"
+                onClick={(e) => e.stopPropagation()}
               >
-                <div
-                  className="
-                    relative w-[85vw] max-w-[340px]
-                    rounded-2xl
-                    bg-white/95
-                    shadow-2xl
-                    border border-black/5
-                    backdrop-blur-md
-                    overflow-hidden
-                    animate-in fade-in zoom-in-95
-                  "
-                  onClick={(e) => e.stopPropagation()}
+                {/* subtle ring */}
+                <div className="absolute inset-0 rounded-2xl ring-1 ring-black/5 pointer-events-none" />
+
+                {/* top gradient bar */}
+                <div className="h-2 w-full bg-gradient-to-r from-pink-200 via-orange-200 to-yellow-200" />
+
+                {/* close button */}
+                <button
+                  className="absolute right-3 top-3 text-neutral-400 hover:text-neutral-700 text-sm"
+                  onClick={() => setSelected(null)}
                 >
-                  <div className="absolute inset-0 rounded-2xl ring-1 ring-black/5" />
+                  ✕
+                </button>
 
-                  <div className="h-2 w-full bg-gradient-to-r from-pink-200 via-orange-200 to-yellow-200" />
+                <div className="p-4">
+                  {/* name */}
+                  <h2 className="text-base font-semibold text-neutral-800 tracking-tight">
+                    ✿ {selected.name}
+                  </h2>
 
-                  <button
-                    className="
-                      absolute right-3 top-3
-                      text-neutral-400 hover:text-neutral-700
-                      text-sm
-                    "
-                    onClick={() => setSelected(null)}
-                  >
-                    ✕
-                  </button>
+                  {/* message */}
+                  <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
+                    {selected.message}
+                  </p>
 
-                  <div className="p-4">
-                    {/* name */}
-                    <h2 className="text-base font-semibold text-neutral-800 tracking-tight">
-                      ✿ {selected.name}
-                    </h2>
-
-                    {/* message */}
-                    <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
-                      {selected.message}
-                    </p>
-
-                    {/* tiny footer doodle */}
-                    <div className="mt-4 flex items-center justify-between text-[11px] text-neutral-300">
-                      <span>•ᴗ•</span>
-                      <span>tap outside to close</span>
-                    </div>
+                  {/* tiny footer doodle */}
+                  <div className="mt-4 flex justify-end text-[11px] text-neutral-300">
+                    <span>•ᴗ•</span>
                   </div>
                 </div>
               </div>
-            )}
+
+              {/* OUTSIDE hint */}
+              <div className="mt-3 text-[11px] text-neutral-300 text-center">
+                tap outside to close
+              </div>
+
+            </div>
+          </div>
+        )}
+
 
             {/* ink trail */}
             {dots.map((d, i) => (
               <div
                 key={i}
-                className="pointer-events-none fixed h-1 w-1 rounded-full bg-neutral-400 dark:bg-neutral-500"
+                className="pointer-events-none fixed h-1 w-1 rounded-full bg-neutral-400"
                 style={{
                   left: d.x,
                   top: d.y,
@@ -286,6 +357,7 @@ export function KeroppiField() {
                 }}
               />
             ))}
+
           </div>
         </div>
       </div>

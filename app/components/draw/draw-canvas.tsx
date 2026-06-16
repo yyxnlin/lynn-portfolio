@@ -13,8 +13,7 @@ import {
   NAME_MAX,
   type Stroke,
 } from "@/types/keroppi";
-import { db } from "@/lib/firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { Eraser } from "lucide-react";
 
 export function DrawCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -24,6 +23,7 @@ export function DrawCanvas() {
   const [currentStroke, setCurrentStroke] = useState<Stroke | null>(null);
   const [color, setColor] = useState(DEFAULT_DRAW_COLOR);
   const [brushSize, setBrushSize] = useState(6);
+  const [eraser, setEraser] = useState(false);
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const isDrawingRef = useRef(false);
@@ -31,7 +31,6 @@ export function DrawCanvas() {
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
 
-  /* ✿ cleaner blackboard (less green, more neutral ink black) */
   const CANVAS_BG = "#0b0c0f";
 
   const redraw = useCallback(() => {
@@ -84,8 +83,8 @@ export function DrawCanvas() {
     const point = getCanvasPoint(e.clientX, e.clientY, e.currentTarget);
 
     setCurrentStroke({
-      color,
-      width: brushSize,
+      color: eraser ? CANVAS_BG : color,
+      width: eraser ? brushSize * 2 : brushSize,
       points: [point],
     });
   };
@@ -144,26 +143,27 @@ export function DrawCanvas() {
     setStatus(null);
 
     try {
-      await addDoc(collection(db, "keroppis"), {
+      const payload = {
         name: name.trim(),
         message: message.trim(),
         strokes,
-        x: Math.random() * (900 - 80),
-        y: Math.random() * (600 - 80),
         scale: 1,
         rotation: (Math.random() - 0.5) * 0.5,
         createdAt: Date.now(),
-      });
+      };
 
-      setStatus("Placed in the canvas!");
+      // store temporarily instead of Firestore
+      sessionStorage.setItem("pending_keroppi", JSON.stringify(payload));
+
+      setStatus("Now place your doodle ✿");
 
       setStrokes([]);
       setName("");
       setMessage("");
 
-      setTimeout(() => router.push("/canvas"), 500);
+      setTimeout(() => router.push("/canvas?placing=1"), 300);
     } catch (err) {
-      setStatus(err instanceof Error ? err.message : "Could not save.");
+      setStatus(err instanceof Error ? err.message : "Could not proceed.");
     } finally {
       setSaving(false);
     }
@@ -225,7 +225,7 @@ export function DrawCanvas() {
           </label>
         </div>
 
-        {/* ✿ TOOLBAR (FIXED SINGLE ROW) */}
+        {/* TOOLBAR */}
         <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl bg-neutral-50/70 dark:bg-neutral-800/40 p-3">
 
           {/* colors */}
@@ -233,7 +233,10 @@ export function DrawCanvas() {
             {DRAW_COLORS.map((preset) => (
               <button
                 key={preset}
-                onClick={() => setColor(preset)}
+                onClick={() => {
+                  setColor(preset);
+                  setEraser(false);
+                }}
                 className={`h-6 w-6 rounded-full border transition hover:scale-110 ${
                   color === preset
                     ? "ring-2 ring-pink-200 ring-offset-1"
@@ -243,8 +246,25 @@ export function DrawCanvas() {
               />
             ))}
           </div>
+          <button
+            onClick={() => setEraser((prev) => !prev)}
+            title="Eraser"
+            className={`
+              flex h-6 w-6 items-center justify-center rounded-full
+              border transition hover:scale-110
+              bg-white dark:bg-neutral-800
+              ${
+                eraser
+                  ? "ring-2 ring-pink-200 ring-offset-1 border-black/10"
+                  : "border-black/10"
+              }
+            `}
+          >
+          <Eraser className="h-3.5 w-3.5 text-neutral-500" />
+          </button>
 
-          {/* brush (SMALLER NOW) */}
+
+          {/* brush */}
           <div className="flex items-center gap-2 text-xs text-neutral-700 dark:text-neutral-300">
             <span>size</span>
 
@@ -276,6 +296,7 @@ export function DrawCanvas() {
             >
               Undo
             </button>
+
 
             <button
               onClick={handleClear}

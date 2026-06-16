@@ -45,9 +45,12 @@ export function KeroppiSprite({
 
     const drawScale = (SPRITE_WIDTH / CANVAS_WIDTH) * dpr;
 
-    renderLineArt(ctx, keroppi.strokes, drawScale, {
+    const strokes = keroppi.strokes;
+
+    renderLineArt(ctx, strokes, drawScale, {
       highlight: isHovered,
     });
+
   }, [keroppi, displayHeight, isHovered]);
 
   return (

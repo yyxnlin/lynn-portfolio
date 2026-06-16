@@ -7,6 +7,7 @@ export type Stroke = {
   color: string;
   width: number;
   points: Point[];
+  isEraser?: boolean; 
 };
 
 export type Keroppi = {

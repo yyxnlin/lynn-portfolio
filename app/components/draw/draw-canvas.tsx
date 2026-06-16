@@ -86,6 +86,7 @@ export function DrawCanvas() {
       color: eraser ? CANVAS_BG : color,
       width: eraser ? brushSize * 2 : brushSize,
       points: [point],
+      isEraser: eraser,
     });
   };
 

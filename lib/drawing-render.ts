@@ -8,6 +8,15 @@ export function renderStroke(
   const { points, color, width } = stroke;
   if (points.length === 0) return;
 
+  const isEraser = (stroke as any).isEraser;
+
+  ctx.save();
+
+  if (isEraser) {
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = "transparent";
+  }
+
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
   ctx.lineWidth = width * scale;
@@ -19,6 +28,7 @@ export function renderStroke(
     ctx.beginPath();
     ctx.arc(p.x * scale, p.y * scale, (width * scale) / 2, 0, Math.PI * 2);
     ctx.fill();
+    ctx.restore();
     return;
   }
 
@@ -36,6 +46,8 @@ export function renderStroke(
   const last = points[points.length - 1];
   ctx.lineTo(last.x * scale, last.y * scale);
   ctx.stroke();
+
+  ctx.restore();
 }
 
 export function renderStrokes(
@@ -56,6 +68,7 @@ export function renderLineArt(
   options?: { highlight?: boolean }
 ) {
   const { highlight = false } = options || {};
+  
 
   ctx.save();
   ctx.scale(scale, scale);
@@ -65,15 +78,16 @@ export function renderLineArt(
 
   // MAIN DRAW PASS
   for (const stroke of strokes) {
+    const isEraser = (stroke as any).isEraser;
+
     ctx.beginPath();
 
     const points = stroke.points;
 
-    // 👉 highlight = white, otherwise original color
-    ctx.strokeStyle = highlight ? "#ffffff" : stroke.color;
+    const shouldHighlight = highlight && !isEraser;
 
-    // 👉 slightly thicker on hover
-    ctx.lineWidth = stroke.width * (highlight ? 1.4 : 1);
+    ctx.strokeStyle = shouldHighlight ? "#ffffff" : stroke.color;
+    ctx.lineWidth = stroke.width * (shouldHighlight ? 1.4 : 1);
 
     for (let i = 0; i < points.length; i++) {
       const p = points[i];

@@ -3,7 +3,7 @@ import { AWARDS } from "../../data/awards";
 export function Awards() {
   return (
     <div>
-      <h3 className="mb-4 text-xs uppercase tracking-[0.25em] text-neutral-400 dark:text-neutral-500">
+      <h3 className="mb-4 text-xs uppercase tracking-[0.25em] text-neutral-400 dark:text-neutral-400">
         Awards
       </h3>
 

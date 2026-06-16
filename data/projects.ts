@@ -3,7 +3,7 @@ export const projects = {
     published: true,
     title: "Predicting Abnormal Heart Rhythms Using ECG Signals",
     description:
-      "Built a lightweight ECG classification model inspired by the FitzHugh–Nagumo dynamical system, enabling efficient detection of abnormal cardiac rhythms from physiological signal data.",
+      "A low-dimensional ECG classification model inspired by the FitzHugh–Nagumo dynamical system, enabling efficient detection of abnormal cardiac rhythms from physiological signal data.",
     date: "2025-12-19",
     readUrl: "/papers/mat292-final-report.pdf",
     github: "yyxnlin/MAT292-final-project",
@@ -14,7 +14,7 @@ export const projects = {
     published: true,
     title: "Unity Maze Game",
     description:
-      "Designed and developed an interactive 2D maze game in Unity to explore how different visual and auditory feedback mechanisms influence player navigation and decision-making.",
+      "An interactive 2D maze game in Unity to explore how different visual and auditory feedback mechanisms influence player navigation and decision-making.",
     date: "2026-04-07",
     github: "richashah29/Maze-Game-Unity",
     image:"/mie-unity-maze-game.png"
@@ -22,9 +22,9 @@ export const projects = {
 
   praxis3: {
     published: true,
-    title: "Wabot",
+    title: "Wabot (water-bot)",
     description:
-      "Autonomous Arduino-powered robot capable of obstacle avoidance, navigation, fire detection, and water pumping for simulated emergency response scenarios.",
+      "An autonomous Arduino-powered robot capable of obstacle avoidance, navigation, proxy fire detection, and water pumping for simulated emergency response scenarios.",
     date: "2026-04-06",
     readUrl: "/papers/wabot-va.pdf",
     github: "yyxnlin/wabot",

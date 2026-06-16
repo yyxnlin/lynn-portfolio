@@ -51,7 +51,7 @@ export function AboutSection() {
         <SectionReveal>
           <div className="mt-20 space-y-10">
 
-            <h3 className="text-xs tracking-[0.25em] text-neutral-400 dark:text-neutral-500 uppercase">
+            <h3 className="text-xs tracking-[0.25em] text-neutral-400 dark:text-neutral-400 uppercase">
               Work Experience
             </h3>
 
@@ -118,7 +118,7 @@ export function AboutSection() {
         <SectionReveal>
           <div className="mt-20 space-y-10">
 
-            <h3 className="text-xs tracking-[0.25em] text-neutral-400 dark:text-neutral-500 uppercase">
+            <h3 className="text-xs tracking-[0.25em] text-neutral-400 dark:text-neutral-400 uppercase">
               Education
             </h3>
 

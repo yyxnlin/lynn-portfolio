@@ -9,11 +9,11 @@ export function CoursesList() {
   return (
     <div className="flex w-full flex-col gap-5">
       <div className="flex flex-col gap-2">
-        <p className="text-xs uppercase tracking-[0.25em] text-neutral-400 dark:text-neutral-500">
+        <p className="text-xs uppercase tracking-[0.25em] text-neutral-400 dark:text-neutral-400">
           Relevant Courses
         </p>
 
-        <p className="text-xs leading-relaxed text-neutral-400 dark:text-neutral-500">
+        <p className="text-xs leading-relaxed text-neutral-400 dark:text-neutral-400">
           Note: These are my personal notes and are provided for reference only.
           Most focus on selected topics from each course and do not necessarily
           cover all material. Some courses are omitted.

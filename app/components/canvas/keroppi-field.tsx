@@ -300,6 +300,13 @@ export function KeroppiField() {
                 : "url('/keroppi-cursor.png'), grab",
             }}
           >
+
+            <div
+              className="absolute bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full px-4 py-2 bg-neutral-800/70 dark:bg-neutral-800/70 border border-black/10 text-[11px] text-neutral-300 dark:text-neutral-300 backdrop-blur-md pointer-events-none"
+            >
+              drag to move around ✿
+            </div>
+
             <div
               className="absolute inset-0 origin-top-left"
               style={{

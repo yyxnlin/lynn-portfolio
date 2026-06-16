@@ -43,7 +43,27 @@ export function KeroppiField() {
   const lastMouse = useRef({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
 
-  const DRAG_THRESHOLD = 4; // pixels
+  const [scale, setScale] = useState(1);
+
+  const DRAG_THRESHOLD = 4;
+
+  /* -------------------- SCALE FIX -------------------- */
+  useEffect(() => {
+    const updateScale = () => {
+      if (!boardRef.current) return;
+
+      const rect = boardRef.current.getBoundingClientRect();
+      const sx = rect.width / BASE_WIDTH;
+      const sy = rect.height / BASE_HEIGHT;
+
+      setScale(Math.min(sx, sy));
+    };
+
+    updateScale();
+    window.addEventListener("resize", updateScale);
+
+    return () => window.removeEventListener("resize", updateScale);
+  }, []);
 
   /* -------------------- load -------------------- */
   useEffect(() => {
@@ -91,36 +111,34 @@ export function KeroppiField() {
     setPlacing(true);
   }, []);
 
-  /* -------------------- PAN -------------------- */
+  /* -------------------- PAN (TOUCH + MOUSE) -------------------- */
   useEffect(() => {
     const el = boardRef.current;
     if (!el) return;
 
-    const down = (e: MouseEvent) => {
+    const getTouch = (e: TouchEvent) =>
+      e.touches[0] || e.changedTouches[0];
+
+    const down = (x: number, y: number) => {
       isDragging.current = true;
       setIsPanning(true);
 
       hasDragged.current = false;
 
-      dragStart.current = { x: e.clientX, y: e.clientY };
-      lastMouse.current = { x: e.clientX, y: e.clientY };
+      dragStart.current = { x, y };
+      lastMouse.current = { x, y };
     };
 
-    const up = () => {
-      isDragging.current = false;
-      setIsPanning(false);
-    };
-
-    const move = (e: MouseEvent) => {
+    const move = (x: number, y: number) => {
       if (!isDragging.current) return;
 
-      const dx = e.clientX - lastMouse.current.x;
-      const dy = e.clientY - lastMouse.current.y;
+      const dx = x - lastMouse.current.x;
+      const dy = y - lastMouse.current.y;
 
-      lastMouse.current = { x: e.clientX, y: e.clientY };
+      lastMouse.current = { x, y };
 
-      const totalDx = e.clientX - dragStart.current.x;
-      const totalDy = e.clientY - dragStart.current.y;
+      const totalDx = x - dragStart.current.x;
+      const totalDy = y - dragStart.current.y;
 
       if (Math.abs(totalDx) > DRAG_THRESHOLD || Math.abs(totalDy) > DRAG_THRESHOLD) {
         hasDragged.current = true;
@@ -132,15 +150,43 @@ export function KeroppiField() {
       }));
     };
 
+    const up = () => {
+      isDragging.current = false;
+      setIsPanning(false);
+    };
 
-    el.addEventListener("mousedown", down);
-    window.addEventListener("mousemove", move);
-    window.addEventListener("mouseup", up);
+    const onMouseDown = (e: MouseEvent) => down(e.clientX, e.clientY);
+    const onMouseMove = (e: MouseEvent) => move(e.clientX, e.clientY);
+    const onMouseUp = () => up();
+
+    const onTouchStart = (e: TouchEvent) => {
+      const t = getTouch(e);
+      down(t.clientX, t.clientY);
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      const t = getTouch(e);
+      move(t.clientX, t.clientY);
+    };
+
+    const onTouchEnd = () => up();
+
+    el.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchend", onTouchEnd);
 
     return () => {
-      el.removeEventListener("mousedown", down);
-      window.removeEventListener("mousemove", move);
-      window.removeEventListener("mouseup", up);
+      el.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+
+      el.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
     };
   }, []);
 
@@ -156,15 +202,15 @@ export function KeroppiField() {
       const nx = e.clientX - rect.left;
       const ny = e.clientY - rect.top;
 
-      const worldX = nx - camera.x;
-      const worldY = ny - camera.y;
+      const worldX = (nx - camera.x) / scale;
+      const worldY = (ny - camera.y) / scale;
 
       setMouse({ x: worldX, y: worldY });
     };
 
     window.addEventListener("mousemove", handleMove);
     return () => window.removeEventListener("mousemove", handleMove);
-  }, [placing, camera]);
+  }, [placing, camera, scale]);
 
   /* -------------------- CLICK TO PLACE -------------------- */
   useEffect(() => {
@@ -173,7 +219,6 @@ export function KeroppiField() {
     const handleClick = async () => {
       if (!mouse) return;
 
-      // KEY FIX: ignore click if drag happened
       if (hasDragged.current) {
         hasDragged.current = false;
         return;
@@ -245,26 +290,20 @@ export function KeroppiField() {
         <div className="w-full aspect-[3/2]">
           <div
             ref={boardRef}
-            className={`relative h-full w-full overflow-hidden rounded-2xl border border-neutral-600/40 shadow-xl touch-none`}
-              style={{
-                background: "#000",
-                boxShadow:
-                  "inset 0 0 70px rgba(0,0,0,0.75), 0 25px 60px rgba(0,0,0,0.35)",
-                cursor: isPanning
-                  ? "url('/keroppi-cursor-link.png'), grabbing"
-                  : "url('/keroppi-cursor.png'), grab",
-              }}
+            className="relative h-full w-full overflow-hidden rounded-2xl border border-neutral-600/40 shadow-xl touch-none"
+            style={{
+              background: "#000",
+              boxShadow:
+                "inset 0 0 70px rgba(0,0,0,0.75), 0 25px 60px rgba(0,0,0,0.35)",
+              cursor: isPanning
+                ? "url('/keroppi-cursor-link.png'), grabbing"
+                : "url('/keroppi-cursor.png'), grab",
+            }}
           >
-            <div
-              className="absolute bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full px-4 py-2 bg-white/80 dark:bg-neutral-900/70 border border-black/10 text-[11px] text-neutral-600 dark:text-neutral-300 backdrop-blur-md pointer-events-none"
-            >
-              drag to move around ✿
-            </div>
-
             <div
               className="absolute inset-0 origin-top-left"
               style={{
-                transform: `translate(${camera.x}px, ${camera.y}px)`,
+                transform: `translate(${camera.x}px, ${camera.y}px) scale(${scale})`,
               }}
             >
               {keroppis.map((keroppi) => (
@@ -365,7 +404,6 @@ export function KeroppiField() {
                 </div>
               </div>
             )}
-
           </div>
         </div>
       </div>

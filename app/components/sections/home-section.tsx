@@ -64,6 +64,9 @@ export function HomeSection() {
 
               <div className="mt-8 sm:mt-10 flex gap-3 sm:gap-4 justify-center lg:justify-start">
                 <a
+                  href="https://www.linkedin.com/in/lynnyltao"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex h-12 w-12 items-center justify-center rounded-full
                   border border-neutral-200 dark:border-neutral-700
                   bg-white dark:bg-neutral-900
@@ -78,6 +81,9 @@ export function HomeSection() {
                 </a>
 
                 <a
+                  href="https://github.com/yyxnlin"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex h-12 w-12 items-center justify-center rounded-full
                   border border-neutral-200 dark:border-neutral-700
                   bg-white dark:bg-neutral-900
@@ -92,6 +98,7 @@ export function HomeSection() {
                 </a>
 
                 <a
+                  href="mailto:lnwtt20@gmail.com"
                   className="flex h-12 w-12 items-center justify-center rounded-full
                   border border-neutral-200 dark:border-neutral-700
                   bg-white dark:bg-neutral-900

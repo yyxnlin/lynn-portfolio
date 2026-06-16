@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getCanvasPoint, renderStrokes } from "@/lib/drawing-render";
 import {
-  CANVAS_HEIGHT,
-  CANVAS_WIDTH,
+  CANVAS_SIZE,
   DEFAULT_DRAW_COLOR,
   DRAW_COLORS,
   MESSAGE_MAX,
@@ -23,7 +22,7 @@ export function DrawCanvas() {
   const [currentStroke, setCurrentStroke] = useState<Stroke | null>(null);
   const [color, setColor] = useState(DEFAULT_DRAW_COLOR);
   const [brushSize, setBrushSize] = useState(6);
-  const [eraser, setEraser] = useState(false);
+  const [tool, setTool] = useState<"pen" | "eraser">("pen");
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const isDrawingRef = useRef(false);
@@ -48,6 +47,7 @@ export function DrawCanvas() {
     renderStrokes(ctx, allStrokes, 1);
   }, [strokes, currentStroke]);
 
+
   useEffect(() => {
     redraw();
   }, [redraw]);
@@ -56,8 +56,8 @@ export function DrawCanvas() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    canvas.width = CANVAS_WIDTH;
-    canvas.height = CANVAS_HEIGHT;
+    canvas.width = CANVAS_SIZE;
+    canvas.height = CANVAS_SIZE;
     redraw();
   }, [redraw]);
 
@@ -83,10 +83,10 @@ export function DrawCanvas() {
     const point = getCanvasPoint(e.clientX, e.clientY, e.currentTarget);
 
     setCurrentStroke({
-      color: eraser ? CANVAS_BG : color,
-      width: eraser ? brushSize * 2 : brushSize,
+      color: tool === "eraser" ? CANVAS_BG : color,
+      width: tool === "eraser" ? brushSize * 2 : brushSize,
       points: [point],
-      isEraser: eraser,
+      isEraser: tool === "eraser",
     });
   };
 
@@ -171,7 +171,7 @@ export function DrawCanvas() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl text-neutral-900 dark:text-neutral-100">
+    <div className="mx-auto max-w-3xl text-neutral-900 dark:text-neutral-100">
 
       {/* Header */}
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -236,26 +236,26 @@ export function DrawCanvas() {
                 key={preset}
                 onClick={() => {
                   setColor(preset);
-                  setEraser(false);
+                  setTool("pen");
                 }}
                 className={`h-6 w-6 rounded-full border transition hover:scale-110 ${
-                  color === preset
-                    ? "ring-2 ring-pink-200 ring-offset-1"
-                    : "border-black/10"
+                    tool === "pen" && color === preset
+                      ? "ring-2 ring-pink-200 ring-offset-1"
+                      : "border-black/10"
                 }`}
                 style={{ backgroundColor: preset }}
               />
             ))}
           </div>
           <button
-            onClick={() => setEraser((prev) => !prev)}
+            onClick={() => setTool("eraser")}
             title="Eraser"
             className={`
               flex h-6 w-6 items-center justify-center rounded-full
               border transition hover:scale-110
               bg-white dark:bg-neutral-800
               ${
-                eraser
+                tool === "eraser"
                   ? "ring-2 ring-pink-200 ring-offset-1 border-black/10"
                   : "border-black/10"
               }
@@ -330,7 +330,7 @@ export function DrawCanvas() {
             ref={canvasRef}
             className="block w-full cursor-crosshair touch-none"
             style={{
-              aspectRatio: `${CANVAS_WIDTH} / ${CANVAS_HEIGHT}`,
+              aspectRatio: `${1} / ${1}`,
               backgroundColor: CANVAS_BG,
             }}
             onPointerDown={handlePointerDown}

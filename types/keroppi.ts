@@ -23,8 +23,7 @@ export type Keroppi = {
   rotation: number;
 };
 
-export const CANVAS_WIDTH = 600;
-export const CANVAS_HEIGHT = 400;
+export const CANVAS_SIZE  = 600;
 export const CANVAS_BG = "#1c211e";
 export const SPRITE_WIDTH = 150;
 export const MESSAGE_MAX = 120;

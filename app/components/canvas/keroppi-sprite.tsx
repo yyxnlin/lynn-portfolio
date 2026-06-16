@@ -3,8 +3,7 @@
 import { useEffect, useRef } from "react";
 import { renderLineArt } from "@/lib/drawing-render";
 import {
-  CANVAS_HEIGHT,
-  CANVAS_WIDTH,
+  CANVAS_SIZE,
   SPRITE_WIDTH,
   type Keroppi,
 } from "@/types/keroppi";
@@ -29,7 +28,7 @@ export function KeroppiSprite({
 }: KeroppiSpriteProps & { scale?: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const displayHeight = (SPRITE_WIDTH * CANVAS_HEIGHT) / CANVAS_WIDTH;
+  const displayHeight = (SPRITE_WIDTH * CANVAS_SIZE) / CANVAS_SIZE;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -43,7 +42,7 @@ export function KeroppiSprite({
     canvas.width = SPRITE_WIDTH * dpr;
     canvas.height = displayHeight * dpr;
 
-    const drawScale = (SPRITE_WIDTH / CANVAS_WIDTH) * dpr;
+    const drawScale = (SPRITE_WIDTH / CANVAS_SIZE) * dpr;
 
     const strokes = keroppi.strokes;
 

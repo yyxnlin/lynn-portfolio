@@ -16,7 +16,7 @@ export const projects = {
     description:
       "An interactive 2D maze game in Unity to explore how different visual and auditory feedback mechanisms influence player navigation and decision-making.",
     date: "2026-04-07",
-    github: "richashah29/Maze-Game-Unity",
+    github: "yyxnlin/unity-maze-game",
     image:"/mie-unity-maze-game.png"
   },
 
@@ -37,7 +37,7 @@ export const projects = {
     description: "A Discord bot that analyzes server conversations, generates a podcast recap of the top moments, and narrates it using users' voice clones via Boson AI's text-to-speech model.",    
     date: "2025-10-26",
     demoUrl: "https://youtu.be/pQ3ZEhj0Lqc",
-    github: "yyxnlin/higgs-audio",
+    github: "yyxnlin/loudlars-discord-bot",
     image: "/loudlars.png"
   },
   blob: {
